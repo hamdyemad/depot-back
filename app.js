@@ -11,7 +11,6 @@ const orderRoute = require("./routes/orders.route");
 const mongoose = require('mongoose');
 const DB_OPTION = { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false };
 
-// DB_URL=mongodb+srv://hamdy:hamdy@commerce.eyedx.mongodb.net/depot?retryWrites=true&w=majority
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -36,5 +35,6 @@ app.use(usersRoute);
 app.use("/cart", cartRoute);
 app.use("/order", orderRoute);
 
+const port = process.env.PORT || 3000;
 // server
-app.listen(3000, console.log("server listend at 3000"));
+app.listen(port, console.log("server listend at" + port));
