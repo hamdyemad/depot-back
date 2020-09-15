@@ -45,7 +45,7 @@ exports.getAllOrders = (req, res) => {
         { dateAdded: query.dateAdded },
       ],
       $nor: [{ _static: 'static' }]
-    })
+    }).sort({ seq: -1, dateAdded: -1 })
       .then((doc) => {
         res.json(doc);
       })
@@ -66,6 +66,7 @@ exports.getOrderById = (req, res) => {
 
 exports.getOrders = (req, res) => {
   Order.find({ userId: req.userId }).then((doc) => {
+    console.log(doc)
     res.json(doc);
   })
 }
