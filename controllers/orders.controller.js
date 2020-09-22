@@ -6,16 +6,13 @@ exports.addOrder = (req, res) => {
     let seq = value.seq;
     let newOrder = new Order({
       userId: req.userId,
+      seq: seq,
       orders: req.body.orders,
       clientName: req.body.clientInfo.clientName,
       address: req.body.clientInfo.address,
       mobile: req.body.clientInfo.mobile,
       city: req.body.clientInfo.city,
-      status: "pending",
-      notifiedCustomer: false,
       comment: req.body.clientInfo.comment,
-      orderHistory: [],
-      seq: seq,
       dateAdded: new Date().toDateString()
     });
     newOrder

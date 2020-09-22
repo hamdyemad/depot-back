@@ -27,18 +27,20 @@ exports.getProducts = (req, res) => {
   }
   let query = req.query;
   console.log(query)
-  if (Object.keys(query).length == 0 || query.category == 'all') {
+  if (Object.keys(query).length == 0 || query.category == 'all' || query.category == 'الكل') {
     /* GET get all products */
     Product.find({ $nor: [{ categorys: 'categorys' }] }).sort({ seq: -1, addedDate: -1 })
       .then((doc) => {
         res.json(doc)
       })
   } else {
+
     /* GET get products by query */
     Product.find({
       $nor: [{ categorys: 'categorys' }],
       $or: [
         { category: query.category },
+        { categoryAr: query.category },
         { seq: query.id },
         { name: query.name },
         { addedDate: query.addedDate },
@@ -58,41 +60,54 @@ exports.getProductById = (req, res) => {
   });
 };
 
+/*
+  if (req.headers["accept-language"] == 'ar') {
+    console.log('ar')
+  } else {
+
+  }
+*/
+
 /* POST new product */
 exports.addNewProduct = (req, res) => {
   req.body.image = req.file.filename;
   let body = req.body;
-  Product.findOne({ name: body.name }).then((doc) => {
+  Product.findOne({ name: body.name, nameAr: body.nameAr }).then((doc) => {
     if (doc) {
-      res.json({ message: "there is product named like this" });
+      res.json({ enMessage: "there is product named like this" });
     } else {
       Product.findOneAndUpdate({ categorys: 'categorys' }, { $inc: { seq: 1 } }).then((value) => {
         let newProduct = new Product({
           seq: value.seq,
+          //en
           name: body.name,
           description: body.description,
           category: body.category,
+          //en
+          //ar
+          nameAr: body.nameAr,
+          descriptionAr: body.descriptionAr,
+          categoryAr: body.categoryAr,
+          //ar
           price: body.price,
           priceAfterDiscount: (body.price - (body.price * body.discount / 100)),
           discount: body.discount,
-          image: body.image,
-          addedDate: new Date().toDateString()
+          image: body.image
         });
         newProduct
           .save()
           .then((doc) => {
             if (doc) {
-              Product.findOneAndUpdate({ categorys: 'categorys' }, { $addToSet: { _categorys: [body.category] } }).then((cat) => {
-                res.json(doc);
-              })
+              Product.findOneAndUpdate(
+                { categorys: 'categorys' }, { $addToSet: { _categorys: [body.category], _categorysAr: [body.categoryAr] } }).then((cat) => {
+                  res.json(doc);
+                })
             }
           })
       })
     }
   });
-  // productModel.AddNewProducts(req.body).then((value) => {
-  //   res.json(value);
-  // })
+
 }
 
 /* PATCH product */

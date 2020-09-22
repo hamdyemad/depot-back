@@ -20,9 +20,16 @@ exports.addNewCart = (req, res) => {
       let cart = new Cart({
         userId: req.userId,
         productId: body.productId,
+        // En
         name: body.name,
         description: body.description,
         category: body.category,
+        // En
+        // AR
+        nameAr: body.nameAr,
+        descriptionAr: body.descriptionAr,
+        categoryAr: body.categoryAr,
+        // AR
         image: body.image,
         price: body.price,
         priceAfterDiscount: body.priceAfterDiscount,
@@ -43,7 +50,7 @@ exports.updateCart = (req, res) => {
   });
 };
 
-/* delte all carts */
+/* delete all carts */
 exports.deleteAllCarts = (req, res) => {
   Cart.deleteMany({ userId: req.userId }).then((value) => {
     res.json(value);

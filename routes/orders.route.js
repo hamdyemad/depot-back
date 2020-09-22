@@ -33,5 +33,4 @@ router.post('/history', verfication.verifyedAdmin, ordersController.addManyOfHis
 /* PATCH update all status */
 router.patch('/', verfication.verifyedAdmin, ordersController.updateStatusOfSpecificOrders)
 
-
 module.exports = router;

@@ -11,6 +11,7 @@ const orderRoute = require("./routes/orders.route");
 const mongoose = require('mongoose');
 const DB_OPTION = { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false };
 
+// mongodb+srv://hamdy:hamdy@commerce.eyedx.mongodb.net/depot?retryWrites=true&w=majority
 app.use(bodyParser.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

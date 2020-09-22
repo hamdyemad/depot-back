@@ -31,13 +31,22 @@ exports.login = (req, res) => {
   let body = req.body;
   User.findOne({ email: body.email }).then((doc) => {
     if (!doc) {
-      res.jason({ emailMessage: "email is incorrect" })
+      if (req.headers['accept-language'] == 'ar') {
+        res.json({ emailMessage: "الايميل الذي ادخلته خطأ" })
+      } else {
+        res.json({ emailMessage: "email is incorrect" })
+      }
     } else {
       bcrypt
         .compare(body.password, doc.password)
         .then((same) => {
           if (!same) {
-            res.json({ passwordMessage: "password is incorrect" })
+            console.log(req.headers)
+            if (req.headers['accept-language'] == 'ar') {
+              res.json({ passwordMessage: "الرقم السري خطأ" })
+            } else {
+              res.json({ passwordMessage: "password is incorrect" })
+            }
           } else {
             switch (doc.role) {
               case 'user': {
