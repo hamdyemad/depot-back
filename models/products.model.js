@@ -16,7 +16,7 @@ const productSchema = mongoose.Schema({
   image: String,
   discount: Number,
   // Other Fields
-  categorys: String,
+  static: String,
   _categorys: Array,
   _categorysAr: Array,
   addedDate: {

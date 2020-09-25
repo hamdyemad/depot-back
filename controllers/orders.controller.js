@@ -2,6 +2,7 @@ const Order = require('../models/order.model');
 
 /* POST Add new order but before we add the order we increament the sequence value and pass the end value to the newest order */
 exports.addOrder = (req, res) => {
+
   Order.findOneAndUpdate({ _static: 'static' }, { $inc: { seq: 1 } }).then((value) => {
     let seq = value.seq;
     let newOrder = new Order({
@@ -10,7 +11,7 @@ exports.addOrder = (req, res) => {
       orders: req.body.orders,
       clientName: req.body.clientInfo.clientName,
       address: req.body.clientInfo.address,
-      mobile: req.body.clientInfo.mobile,
+      mobile: `0${req.body.clientInfo.mobile}`,
       city: req.body.clientInfo.city,
       comment: req.body.clientInfo.comment,
       dateAdded: new Date().toDateString()

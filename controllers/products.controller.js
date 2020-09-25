@@ -11,9 +11,21 @@ function deleteImg(img) {
 
 /* GET get all categorys */
 exports.getAllCategorys = (req, res) => {
-  Product.find({ categorys: 'categorys' }).then((doc) => {
+  Product.find({ static: 'static' }).then((doc) => {
     res.json(doc)
   });
+}
+
+/* POST add new category */
+exports.addNewCategory = (req, res) => {
+  Product.findOneAndUpdate({ static: 'static' }, {
+    $addToSet: {
+      _categorys: req.body.newCategory,
+      _categorysAr: req.body.newCategoryAr
+    }
+  }).then(doc => {
+    res.json(doc);
+  })
 }
 
 /* GET products by options */
@@ -29,7 +41,7 @@ exports.getProducts = (req, res) => {
   console.log(query)
   if (Object.keys(query).length == 0 || query.category == 'all' || query.category == 'الكل') {
     /* GET get all products */
-    Product.find({ $nor: [{ categorys: 'categorys' }] }).sort({ seq: -1, addedDate: -1 })
+    Product.find({ $nor: [{ static: 'static' }] }).sort({ seq: -1, addedDate: -1 })
       .then((doc) => {
         res.json(doc)
       })
@@ -37,7 +49,7 @@ exports.getProducts = (req, res) => {
 
     /* GET get products by query */
     Product.find({
-      $nor: [{ categorys: 'categorys' }],
+      $nor: [{ static: 'static' }],
       $or: [
         { category: query.category },
         { categoryAr: query.category },
@@ -76,7 +88,7 @@ exports.addNewProduct = (req, res) => {
     if (doc) {
       res.json({ enMessage: "there is product named like this" });
     } else {
-      Product.findOneAndUpdate({ categorys: 'categorys' }, { $inc: { seq: 1 } }).then((value) => {
+      Product.findOneAndUpdate({ static: 'static' }, { $inc: { seq: 1 } }).then((value) => {
         let newProduct = new Product({
           seq: value.seq,
           //en
@@ -99,7 +111,7 @@ exports.addNewProduct = (req, res) => {
           .then((doc) => {
             if (doc) {
               Product.findOneAndUpdate(
-                { categorys: 'categorys' }, { $addToSet: { _categorys: [body.category], _categorysAr: [body.categoryAr] } }).then((cat) => {
+                { static: 'static' }, { $addToSet: { _categorys: [body.category], _categorysAr: [body.categoryAr] } }).then((cat) => {
                   res.json(doc);
                 })
             }

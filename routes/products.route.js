@@ -19,7 +19,10 @@ router.post("/", verfication.verifyedAdmin, multer({
 }).single('image'), productsController.addNewProduct);
 
 /* GET get all categorys */
-router.get('/categorys', productsController.getAllCategorys)
+router.get('/categorys', productsController.getAllCategorys);
+
+/* POST add new category */
+router.post('/categorys', productsController.addNewCategory);
 
 /* GET product by id */
 router.get("/:id", productsController.getProductById);
