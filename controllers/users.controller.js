@@ -1,4 +1,3 @@
-const usersModel = require("../models/users.model");
 const User = require('../models/users.model');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -63,9 +62,13 @@ exports.login = (req, res) => {
                 res.json({ access_token: token, role: doc.role });
               }
                 break
-              default: {
-                res.json(user);
+              case 'super-admin': {
+                let token = jwt.sign({ userId: doc._id, role: doc.role }, process.env.adminSecretKey, {
+                  expiresIn: "1h",
+                });
+                res.json({ access_token: token, role: doc.role });
               }
+                break
             }
           }
         })
@@ -77,43 +80,75 @@ exports.login = (req, res) => {
   })
 };
 
-/* GET all Users */
-exports.getAllUsers = (req, res) => {
-  User.find()
-    .sort({ addedDate: -1 })
-    .then((doc) => {
-      res.json(doc)
-    })
+/* GET all Admins */
+exports.getAllAdmins = (req, res) => {
+  console.log(req.role);
+  if (req.role == 'super-admin') {
+    User.find({ $or: [{ role: 'admin' }, { role: 'super-admin' }] })
+      .sort({ addedDate: -1 })
+      .then((doc) => {
+        res.json(doc)
+      })
+  } else {
+    res.sendStatus(401);
+  }
 };
 
-/* PATCH User */
-exports.updateUser = (req, res) => {
+/* POST add new admin */
+exports.addAdmin = (req, res) => {
   let body = req.body;
-  User.findById(req.params.id)
-    .then((doc) => {
+  User.findOne({ email: body.email }).then((doc) => {
+    if (doc) {
+      res.json({ emailMessage: "this email is already taken" });
+    } else {
       bcrypt.hash(body.password, 10).then((hashedPassword) => {
-        User.updateOne({
+        let newUser = new User({
           userName: body.userName,
           email: body.email,
           password: hashedPassword,
-        }).then((value) => {
-          res.json(value)
+          addedDate: new Date(),
+          role: req.role
+        });
+        newUser.save().then((doc) => {
+          res.json(doc);
         });
       });
-    })
-};
+    }
+  })
+}
 
-/* DELETE by ID */
-exports.deleteUser = (req, res) => {
-  let userId = req.params.id;
-  User.findById(userId)
-    .then((doc) => {
-      User.deleteOne(doc)
-        .then((value) => {
-          res.json(value);
-        })
+/* GET user information by id */
+exports.getUserInfo = (req, res) => {
+  User.find({ _id: req.userId }).then((doc) => {
+    res.json(doc);
+  })
+}
+
+
+/* PATCH update admin role */
+exports.updateAdminRole = (req, res) => {
+  if (req.role == 'super-admin') {
+    User.findOneAndUpdate({ _id: req.params.id }, {
+      role: req.body.role
+    }).then((doc) => {
+      res.json(doc);
     })
-    .catch((err) => {
-      res.json({ message: "there is no user like this" });
-    });
+  } else {
+    res.sendStatus(401)
+  }
+}
+
+/* DELETE admin by ID */
+exports.deleteAdmin = (req, res) => {
+  if (req.role == 'super-admin') {
+    const userId = req.params.id;
+    User.findOneAndDelete({ _id: userId }).then((doc) => {
+      res.json(doc);
+    })
+      .catch((err) => {
+        console.log(err)
+      })
+  } else {
+    res.sendStatus(401)
+  }
 };

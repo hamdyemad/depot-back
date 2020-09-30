@@ -23,6 +23,7 @@ exports.verifyedAdmin = (req, res, next) => {
       let payload = jwt.verify(authorization, process.env.adminSecretKey);
       if (payload) {
         req.userId = payload.userId;
+        req.role = payload.role;
       }
     } catch (err) {
       res.sendStatus(401);
